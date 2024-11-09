@@ -1,184 +1,248 @@
- /* Null style ============================================================================================================= */
- * {
-   padding: 0;
-   margin: 0;
-   border: 0;
-   -webkit-tap-highlight-color: transparent;
- }
+/* Null style ============================================================================================================= */
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
- *,
- *:before,
- *:after {
-   -moz-box-sizing: border-box;
-   -webkit-box-sizing: border-box;
-   box-sizing: border-box;
- }
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
- :focus,
- :active {
-   outline: none;
- }
+:focus,
+:active {
+  outline: none;
+}
 
- a:focus,
- a:active {
-   outline: none;
- }
+a:focus,
+a:active {
+  outline: none;
+}
 
- nav,
- footer,
- header,
- aside {
-   display: block;
- }
+nav,
+footer,
+header,
+aside {
+  display: block;
+}
 
- html,
- body {
-   height: 100%;
-   width: 100%;
-   font-size: 100%;
-   line-height: 1;
-   font-size: 14px;
-   -ms-text-size-adjust: 100%;
-   -moz-text-size-adjust: 100%;
-   -webkit-text-size-adjust: 100%;
- }
+html,
+body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
 
- input,
- button,
- textarea {
-   font-family: inherit;
- }
+input,
+button,
+textarea {
+  font-family: inherit;
+}
 
- input::-ms-clear {
-   display: none;
- }
+input::-ms-clear {
+  display: none;
+}
 
- button {
-   cursor: pointer;
- }
+button {
+  cursor: pointer;
+}
 
- button::-moz-focus-inner {
-   padding: 0;
-   border: 0;
- }
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
 
- a,
- a:visited {
-   text-decoration: none;
- }
+a,
+a:visited {
+  text-decoration: none;
+}
 
- a:hover {
-   text-decoration: none;
- }
+a:hover {
+  text-decoration: none;
+}
 
- ul li {
-   list-style: none;
- }
+ul li {
+  list-style: none;
+}
 
- img,
- picture {
-   vertical-align: top;
- }
+img,
+picture {
+  vertical-align: top;
+}
 
- h1,
- h2,
- h3,
- h4,
- h5,
- h6 {
-   font-size: inherit;
-   font-weight: 400;
- }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: 400;
+}
 
- input::-webkit-outer-spin-button,
- input::-webkit-inner-spin-button {
-   -webkit-appearance: none;
-   margin: 0;
- }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
- input[type="number"] {
-   -moz-appearance: textfield;
- }
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 
- input {
-   border-radius: 0;
- }
+input {
+  border-radius: 0;
+}
 
- /* Tailwind style ============================================================================================================= */
+/* Tailwind style ============================================================================================================= */
 
- @tailwind base;
- @tailwind components;
- @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
- @layer base {
+@layer base {
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Thin.ttf') format('TrueType');
+    font-weight: 100;
+    font-style: normal;
+  }
 
-   input[type='number']::-webkit-outer-spin-button,
-   input[type='number']::-webkit-inner-spin-button,
-   input[type='number'] {
-     -webkit-appearance: none;
-     margin: 0;
-     -moz-appearance: textfield !important;
-   }
- }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-ExtraLight.ttf') format('TrueType');
+    font-weight: 200;
+    font-style: normal;
+  }
 
- @layer components {
-   .btn {
-     @apply bg-yellow-500 transition-hover text-black;
-     border-radius: 10px;
-     padding: 6px 12px;
-     font-size: 18px;
-     font-weight: 500;
-   }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Light.ttf') format('TrueType');
+    font-weight: 300;
+    font-style: normal;
+  }
 
-   @media (any-hover:hover) {
-     .btn:hover {
-       @apply bg-yellow-400 scale-[0.98];
-     }
-   }
- }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Regular.ttf') format('TrueType');
+    font-weight: 400;
+    font-style: normal;
+  }
 
- @layer utilities {
-   .container {
-     width: 100%;
-     max-width: 1130px;
-     padding: 0 15px;
-     margin: 0 auto;
-   }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Medium.ttf') format('TrueType');
+    font-weight: 500;
+    font-style: normal;
+  }
 
-   .transition {
-     transition: all 0.3s ease 0s;
-   }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-SemiBold.ttf') format('TrueType');
+    font-weight: 600;
+    font-style: normal;
+  }
 
-   .transition-hover {
-     @media(any-hover:hover) {
-       transition: all 0.3s ease 0s;
-       cursor: pointer;
-     }
-   }
- }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Bold.ttf') format('TrueType');
+    font-weight: 700;
+    font-style: normal;
+  }
 
- html, body, #app, .wrapper {
-   height: 100%;
- }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-ExtraBold.ttf') format('TrueType');
+    font-weight: 800;
+    font-style: normal;
+  }
 
- body {
-   @apply bg-turquoise-800 text-white;
- }
+  @font-face {
+    font-family: 'Exo2';
+    src: url('@/assets/fonts/Exo2-Black.ttf') format('TrueType');
+    font-weight: 900;
+    font-style: normal;
+  }
 
- .wrapper {
-   display: flex;
-   flex-direction: column;
- }
 
- .page {
-   display: flex;
-   flex-direction: column;
-   flex: 1 1 auto;
-   padding-top: 66px;
- }
 
- @media (min-width: 768px) {
-   .page {
-     padding-top: 75px;
-   }
- }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number'] {
+    -webkit-appearance: none;
+    margin: 0;
+    -moz-appearance: textfield !important;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply bg-yellow-500 transition-hover text-black;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  @media (any-hover:hover) {
+    .btn:hover {
+      @apply bg-yellow-400 scale-[0.98];
+    }
+  }
+}
+
+@layer utilities {
+  .container {
+    width: 100%;
+    max-width: 1130px;
+    padding: 0 15px;
+    margin: 0 auto;
+  }
+
+  .transition {
+    transition: all 0.3s ease 0s;
+  }
+
+  .transition-hover {
+    @media(any-hover:hover) {
+      transition: all 0.3s ease 0s;
+      cursor: pointer;
+    }
+  }
+}
+
+html, body, #app, .wrapper {
+  height: 100%;
+}
+
+body {
+  @apply bg-turquoise-800 text-white font-[Exo2];
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  padding-top: 66px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-top: 75px;
+  }
+}

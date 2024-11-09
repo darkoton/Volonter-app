@@ -1,7 +1,19 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const money = ref(100)
+const isError = ref(false)
+
+function submit() {
+  if (money.value > 0) {
+    isError.value = false
+    router.push('/payment')
+    return
+  }
+  isError.value = true
+}
 </script>
 
 <template>
@@ -12,7 +24,7 @@ const money = ref(100)
       class="relative h-full z-10 before:content-[''] before:bg-black before:-z-10 before:bg-opacity-50 before:absolute before:top-0 before:left-0 before:w-full before:h-full">
       <div class="container h-full">
         <div
-          class="flex h-full items-center flex-col lg:flex-row flex-wrap justify-center lg:justify-between gap-y-[40px] gap-x-[20px] py-[20px]">
+          class="flex h-full items-center flex-col lg:flex-row flex-wrap justify-center lg:justify-between gap-y-[40px] gap-x-[20px] py-[100px]">
           <div class="flex flex-col lg:max-w-[48%]">
             <h1
               class="text-[26px] leading-[28px] md:text-[30px] md:leading-[32px] lg:text-[36px] lg:leading-[38px] xl:text-[40px] xl:leading-[42px] font-bold mb-[20px]">
@@ -42,10 +54,12 @@ const money = ref(100)
             <h2 class="text-[20px] md:text-[24px] font-semibold text-turquoise-800 mb-[5px] md:mb-[10px]">Разова
               допомога</h2>
             <form class="w-full flex flex-col gap-y-[10px] md:gap-y-[20px] text-black">
-
-              <div class="flex items-center gap-x-[20px] px-[15px] border-turquoise-600 rounded-lg border-[2px]">
-                <input v-model="money" class="w-full text-[25px] leading-[27px] md:text-[35px] md:leading-[36px] reset"
-                  type="number" placeholder="Сума">
+              <div
+                class="flex items-center gap-x-[20px] px-[15px] py-[3px] border-turquoise-600 rounded-lg border-[2px]"
+                :class='isError && "!border-red-500"'>
+                <input v-model="money" min="1"
+                  class="w-full text-[25px] leading-[27px] md:text-[35px] md:leading-[34px]" type="number"
+                  placeholder="Сума">
                 <span class="text-[26px] font-bold">ГРН</span>
               </div>
 
@@ -61,7 +75,7 @@ const money = ref(100)
               <textarea
                 class=" text-[20px] resize-y px-[10px] min-h-[100px] py-[5px] border-turquoise-600 border-[2px] rounded-lg"
                 placeholder="Повiдомлення"></textarea>
-              <button type="submit"
+              <button type="button" @click='submit'
                 class="btn py-[8px] md:py-[10px] text-[18px] md:text-[20px] font-bold">Підтримати</button>
             </form>
           </div>
