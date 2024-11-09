@@ -76,9 +76,10 @@ function submit() {
                 <input
                   v-model="money"
                   min="1"
-                  class="w-full text-[25px] leading-[27px] md:text-[35px] md:leading-[34px]"
+                  class="w-full p-0 border-0 !shadow-[#0000] text-[25px] leading-[27px] md:text-[35px] md:leading-[34px]"
                   type="number"
                   placeholder="Сума"
+                  style="--tw-ring-shadow: #0000"
                 />
                 <span class="text-[26px] font-bold">ГРН</span>
               </div>
