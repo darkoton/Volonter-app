@@ -1,10 +1,58 @@
 <script setup>
+import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useRouter } from 'vue-router'
+import * as yup from 'yup';
 
 const router = useRouter()
 
+const schema = yup.object({
+  name: yup.string().required("Заповніть поле"),
+  email: yup.string().email("В правильний email").required("Заповніть поле"),
+  phone: yup.string().matches(/^[+]?[0-9]{10,15}$/, "Введіть правильний номер телефона").required("Заповніть поле"),
+  password: yup.string().min(8, "Пароль має бути не менше 8 символів").trim().required("Заповніть поле"),
+  confirmPassword: yup.string()
+    .oneOf([yup.ref('password')], "Паролі мають співпадати") // Проверка на совпадение с password
+    .min(8, "Пароль має бути не менше 8 символів")
+    .trim()
+    .required("Заповніть поле"),
+});
+
+const form = [
+  {
+    title: "Ваше ім'я",
+    name: "name",
+    placeholder: "Alex Muller",
+    type: "text"
+  },
+  {
+    title: "Ваший email",
+    name: "email",
+    placeholder: "name@company.com",
+    type: "email"
+  },
+  {
+    title: "Ваший номер телефона",
+    name: "phone",
+    placeholder: "+380986252683",
+    type: "text"
+  },
+  {
+    title: "Пароль",
+    name: "password",
+    placeholder: "••••••••",
+    type: "text"
+  },
+  {
+    title: "Підтвердіть пароль",
+    name: "confirmPassword",
+    placeholder: "••••••••",
+    type: "text"
+  }
+]
+
 function submit() {
-  router.push('/profile')
+  console.log('submit')
+  // router.push('/profile')
 }
 </script>
 
@@ -17,39 +65,24 @@ function submit() {
           <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
             Створіть акаунт
           </h1>
-          <form class="space-y-4 md:space-y-6" action="#">
-            <div>
-              <label for="email" class="block mb-2 text-sm font-medium text-white">Ваший email</label>
-              <input type="email" name="email" id="email"
+          <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema" v-slot="{ errors }">
+            <div v-for="fieldData in form" :key="fieldData.name">
+              <label :for="fieldData.name" class="block mb-2 text-sm font-medium text-white">
+                {{ fieldData.title }}
+              </label>
+              <Field :type="fieldData.type" :name="fieldData.name" :id="fieldData.name"
                 class="bg-turquoise-700 border-turquoise-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5 placeholder-turquoise-400"
-                placeholder="name@company.com" required />
+                :class="errors[fieldData.name] && 'border-red-400'" :placeholder="fieldData.placeholder" required />
+              <ErrorMessage :name="fieldData.name" class="text-red-400" />
             </div>
-            <div>
-              <label for="phone" class="block mb-2 text-sm font-medium text-white">Ваший номер телефона</label>
-              <input type="text" name="phone" id="phone"
-                class="bg-turquoise-700 border-turquoise-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5 placeholder-turquoise-400"
-                placeholder="+380 98 625 268 3" required />
-            </div>
-            <div>
-              <label for="password" class="block mb-2 text-sm font-medium text-white">Пароль</label>
-              <input type="password" name="password" id="password" placeholder="••••••••"
-                class="bg-turquoise-700 border-turquoise-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5 placeholder-turquoise-400"
-                required />
-            </div>
-            <div>
-              <label for="confirm-password" class="block mb-2 text-sm font-medium text-white">Підтвердіть пароль</label>
-              <input type="password" name="confirm-password" id="confirm-password" placeholder="••••••••"
-                class="bg-turquoise-700 border-turquoise-600 text-white text-sm rounded-lg focus:ring-yellow-500 focus:border-yellow-500 block w-full p-2.5 placeholder-turquoise-400"
-                required />
-            </div>
-            <button @click="submit" type="submit" class="btn w-full">
+            <button type="submit" class="btn w-full">
               Cтворити акаунт
             </button>
             <p class="text-sm font-light text-turquoise-400">
               Вже маєте акаунт? <router-link to="login" class="font-medium link">Увійдіть
                 тут</router-link>
             </p>
-          </form>
+          </Form>
         </div>
       </div>
     </div>

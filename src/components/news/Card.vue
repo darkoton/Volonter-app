@@ -1,10 +1,10 @@
 <template>
 
 
-  <div class="w-full max-w-[500px] group bg-turquoise-900 border border-turquoise-700 rounded-lg shadow">
-    <div class="max-h-[300px] overflow-hidden">
-      <img class="group-hover:scale-[1.1] transition rounded-t-lg w-full h-full object-cover" src="/img/avatar.jpg"
-        alt="" />
+  <div
+    class="w-full max-w-[500px] group bg-turquoise-900 border border-turquoise-700 rounded-lg overflow-hidden shadow">
+    <div class="max-h-[300px] overflow-hidden ">
+      <img class="group-hover:scale-[1.1] transition w-full h-full object-cover" src="/img/avatar.jpg" alt="" />
     </div>
     <div class="p-4">
       <h5 class="mb-2 text-[20px] leading-[22px] md:text-[24px] md:leading-[26px] font-bold tracking-tight text-white">

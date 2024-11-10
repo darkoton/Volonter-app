@@ -1,12 +1,37 @@
 <script setup>
+import { Form, Field, ErrorMessage } from 'vee-validate';
+import * as yup from 'yup';
 import { onMounted } from "vue";
 import { initDatepickers } from "flowbite";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const schema = yup.object({
+  name: yup.string().trim().required("Заповніть поле"),
+  number: yup.number().positive("Не правильний номер картки").min(999999999999999, "Не правильний номер картки").required("Заповніть поле"),
+  date: yup.string()
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, "Введіть правильну дату (mm/yy)") // Проверка формата mm/yy
+    .test("valid-date", "Введіть правильну дату", value => {
+      console.log(value);
+
+      if (!value) return false;
+
+      const [month, year] = value.split('/');
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth() + 1; // Месяцы от 0 до 11
+
+      // Проверка на валидность года и месяца
+      const isValidYear = parseInt(year, 10) >= (currentYear % 100); // Последние 2 цифры текущего года
+      const isValidMonth = parseInt(month, 10) >= currentMonth || (parseInt(year, 10) > currentYear % 100);
+
+      return isValidMonth && isValidYear;
+    })
+    .required("Заповніть поле"), cvv: yup.number().min(99, 'Код повинен бути 3-х значним').max(999, 'Код повинен бути 3-х значним').required("Заповніть поле"),
+});
+
 function submit() {
-  router.push("/payment-confirm");
+  // router.push("/payment-confirm");
 }
 
 onMounted(() => {
@@ -22,33 +47,42 @@ onMounted(() => {
         <h2 class="text-xl font-semibold text-white sm:text-2xl">Оплата</h2>
 
         <div class="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12">
-          <form
+          <Form
             class="w-full rounded-lg border border-turquoise-700 bg-turquoise-900 p-4 shadow-sm sm:p-6 lg:max-w-xl lg:p-8"
-            @submit="submit">
+            @submit="submit" :validation-schema="schema" v-slot="{ errors }">
             <div class="mb-6 grid grid-cols-2 gap-4">
               <div class="col-span-2 sm:col-span-1">
-                <label for="full_name" class="mb-2 block text-sm font-medium text-white">
+                <label for="name" class="mb-2 block text-sm font-medium text-white">
                   Повне ім'я (як зазначено на картці)*
                 </label>
-                <input type="text" id="full_name"
+                <!-- <Field name="name" :rules="rules" v-slot="{ field, errors, errorMessage }">
+                  {{ console.log(field) }}
+                  <input v-bind="field" type="text" />
+                  <span>{{ errors[0] }}</span>
+                  <span>{{ errorMessage }}</span>
+                </Field> -->
+                <Field name="name" type="text" id="name"
                   class="block w-full rounded-lg border border-turquoise-600 bg-turquoise-700 p-2.5 text-sm text-white placeholder:text-turquoise-400 focus:border-primary-500 focus:ring-primary-500"
                   placeholder="Алекс Мюллер" required />
+                <ErrorMessage name="name" class="text-red-400" />
+
               </div>
 
               <div class="col-span-2 sm:col-span-1">
-                <label for="card-number-input" class="mb-2 block text-sm font-medium text-white">
+                <label for="number" class="mb-2 block text-sm font-medium text-white">
                   Номер картки*
                 </label>
-                <input type="text" id="card-number-input"
+                <Field name="number" type="number" id="number"
                   class="block w-full rounded-lg border border-turquoise-600 bg-turquoise-700 p-2.5 pe-10 text-sm text-white placeholder:text-turquoise-400 focus:border-primary-500 focus:ring-primary-500"
-                  placeholder="xxxx-xxxx-xxxx-xxxx" pattern="^[0-9]{12}(?:[0-9]{3})?$" required />
+                  placeholder="xxxxxxxxxxxxxxxx" pattern="^[0-9]{12}(?:[0-9]{3})?$" required />
+                <ErrorMessage name="number" class="text-red-400" />
               </div>
 
               <div>
-                <label for="card-expiration-input" class="mb-2 block text-sm font-medium text-white">Термін дії
+                <label for="date" class="mb-2 block text-sm font-medium text-white">Термін дії
                   картки*</label>
                 <div class="relative">
-                  <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5">
+                  <div class="pointer-events-none inline-block absolute top-[12px] inset-y-0 start-0 ps-3.5">
                     <svg class="h-4 w-4 text-turquoise-500 dark:text-turquoise-400" aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                       <path fill-rule="evenodd"
@@ -56,9 +90,10 @@ onMounted(() => {
                         clip-rule="evenodd" />
                     </svg>
                   </div>
-                  <input datepicker datepicker-format="mm/yy" id="card-expiration-input" type="text"
+                  <Field name="date" datepicker datepicker-format="mm/yy" id="date" type="text"
                     class="block w-full rounded-lg border p-2.5 ps-9 text-sm border-turquoise-600 bg-turquoise-700 text-white placeholder:text-turquoise-400 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="12/23" required />
+                  <ErrorMessage name="date" class="text-red-400" />
                 </div>
               </div>
 
@@ -78,16 +113,18 @@ onMounted(() => {
                     <div class="tooltip-arrow" data-popper-arrow></div>
                   </div>
                 </label>
-                <input type="number" id="cvv-input" aria-describedby="helper-text-explanation"
+                <Field name="cvv" type="number" id="cvv" aria-describedby="helper-text-explanation"
                   class="block w-full rounded-lg border border-turquoise-600 bg-turquoise-700 p-2.5 text-sm text-white placeholder:text-turquoise-400 focus:border-primary-500 focus:ring-primary-500"
                   placeholder="•••" required />
+                <ErrorMessage name="cvv" class="text-red-400" />
+
               </div>
             </div>
 
             <button type="submit" class="flex justify-center w-full btn">
               Підтримати зараз
             </button>
-          </form>
+          </Form>
 
           <div class="mt-6 grow sm:mt-8 lg:mt-0">
             <div class="space-y-4 rounded-lg border border-turquoise-700 bg-turquoise-900 p-6">

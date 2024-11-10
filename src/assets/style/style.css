@@ -53,6 +53,10 @@ input::-ms-clear {
   display: none;
 }
 
+input:is(:-webkit-autofill, :autofill) {
+  transition: all 5000000ms ease 5000000ms;
+}
+
 button {
   cursor: pointer;
 }
