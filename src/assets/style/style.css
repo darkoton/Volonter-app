@@ -199,6 +199,22 @@ input {
       @apply bg-yellow-400 scale-[0.98];
     }
   }
+
+  .link {
+    @apply transition-hover relative;
+  }
+
+  .link::after {
+    @apply content-[''] absolute bottom-0 left-0 h-[1px] w-0 transition-hover bg-yellow-400;
+  }
+
+  .link:hover {
+    @apply text-yellow-400;
+  }
+
+  .link:hover::after {
+    @apply w-full;
+  }
 }
 
 @layer utilities {

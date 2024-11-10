@@ -1,3 +1,7 @@
+<script setup>
+import Table from '@components/shelters/Table.vue';
+</script>
+
 <template>
-  <span>Shelters!</span>
+  <Table />
 </template>

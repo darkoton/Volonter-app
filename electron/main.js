@@ -44,7 +44,7 @@ function createWindow() {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
 
     // Open the DevTools.
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   })
 
   if (VITE_DEV_SERVER_URL) {

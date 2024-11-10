@@ -1,9 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Logo from '@components/Logo.vue'
 import { Icon } from '@iconify/vue';
 
 const activeMenu = ref(false)
+
+function closeMenu() {
+  activeMenu.value = false
+}
+
 
 </script>
 
@@ -25,21 +30,22 @@ const activeMenu = ref(false)
             :class="activeMenu && '!bg-turquoise-500'"
             :icon='!activeMenu ? "iconamoon:menu-burger-horizontal-duotone" : "ic:round-close"'
             @click="activeMenu = !activeMenu" />
-          <router-link to="/"
-            class="relative transition-hover hover:text-yellow-400 after:content-[''] after:absolute after:bg-yellow-400 after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition hover:after:w-full">
+          <router-link @click="closeMenu" to="/" class="link after:h-[2px]">
             Пiдтримати
           </router-link>
-          <router-link to="/join"
-            class="relative transition-hover hover:text-yellow-400 after:content-[''] after:absolute after:bg-yellow-400 after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition hover:after:w-full">
+
+          <!-- <router-link @click="closeMenu" to="/join" class="link after:h-[2px]">
             Долучитись до нас
-          </router-link>
-          <router-link to="/shelters"
-            class="relative transition-hover hover:text-yellow-400 after:content-[''] after:absolute after:bg-yellow-400 after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition hover:after:w-full">
+          </router-link> -->
+          <router-link @click="closeMenu" to="/shelters" class="link after:h-[2px]">
             Притулки Львова
+          </router-link>
+          <router-link @click="closeMenu" to="/news" class="link after:h-[2px]">
+            Новини
           </router-link>
         </nav>
 
-        <button class="text-[16px] md:text-[18px] btn">Зареєструватися</button>
+        <router-link to="/join" class="text-[16px] md:text-[18px] btn">Долучитись до нас</router-link>
       </div>
     </div>
   </header>
