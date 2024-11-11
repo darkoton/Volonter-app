@@ -204,6 +204,10 @@ input {
     }
   }
 
+  .btn:disabled {
+    @apply bg-yellow-900 text-gray-800 scale-100 cursor-not-allowed;
+  }
+
   .link {
     @apply transition-hover relative;
   }

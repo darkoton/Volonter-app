@@ -13,6 +13,7 @@
   "dependencies": {
     "firebase": "^10.14.1",
     "flowbite": "^2.5.2",
+    "pinia": "^2.2.6",
     "vee-validate": "^4.14.7",
     "vue": "^3.4.21",
     "vue-router": "^4.4.5",

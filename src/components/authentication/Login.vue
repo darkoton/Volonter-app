@@ -7,7 +7,7 @@ const router = useRouter()
 
 const schema = yup.object({
   email: yup.string().email("В правильний email").required("Заповніть поле"),
-  password: yup.string().min(8, "Пароль має бути не менше 8 символів").trim().required("Заповніть поле"),
+  password: yup.string().trim().required("Заповніть поле"),
 });
 
 const form = [
@@ -21,7 +21,7 @@ const form = [
     title: "Пароль",
     name: "password",
     placeholder: "••••••••",
-    type: "text"
+    type: "password"
   },
 
 ]
@@ -40,7 +40,8 @@ function submit() {
           <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
             Увійдіть у свій обліковий запис
           </h1>
-          <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema" v-slot="{ errors }">
+          <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema"
+            v-slot="{ errors, isSubmitting }">
             <div v-for="fieldData in form" :key="fieldData.name">
               <label :for="fieldData.name" class="block mb-2 text-sm font-medium text-white">
                 {{ fieldData.title }}
@@ -62,7 +63,7 @@ function submit() {
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn w-full">
+            <button :disabled="isSubmitting" type="submit" class="btn w-full">
               Увійти
             </button>
             <p class="text-sm font-light text-turquoise-400">

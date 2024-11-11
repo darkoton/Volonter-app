@@ -2,17 +2,20 @@
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useRouter } from 'vue-router'
 import * as yup from 'yup';
-
+import { register } from '@plugins/firebase/auth.js'
+import { addData } from '@plugins/firebase/firestore.js'
 const router = useRouter()
 
 const schema = yup.object({
   name: yup.string().required("Заповніть поле"),
   email: yup.string().email("В правильний email").required("Заповніть поле"),
   phone: yup.string().matches(/^[+]?[0-9]{10,15}$/, "Введіть правильний номер телефона").required("Заповніть поле"),
-  password: yup.string().min(8, "Пароль має бути не менше 8 символів").trim().required("Заповніть поле"),
+  password: yup.string()
+    .min(6, "Пароль має бути не менше 6 символів")
+    .trim().required("Заповніть поле"),
   confirmPassword: yup.string()
     .oneOf([yup.ref('password')], "Паролі мають співпадати") // Проверка на совпадение с password
-    .min(8, "Пароль має бути не менше 8 символів")
+    .min(6, "Пароль має бути не менше 6 символів")
     .trim()
     .required("Заповніть поле"),
 });
@@ -40,19 +43,35 @@ const form = [
     title: "Пароль",
     name: "password",
     placeholder: "••••••••",
-    type: "text"
+    type: "password"
   },
   {
     title: "Підтвердіть пароль",
     name: "confirmPassword",
     placeholder: "••••••••",
-    type: "text"
+    type: "password"
   }
 ]
 
-function submit() {
-  console.log('submit')
-  // router.push('/profile')
+async function submit(values, { resetForm }) {
+  try {
+    const user = await register(values.email, values.password)
+    const { accessToken, uid, email } = user
+
+    const userInfo = await addData(["users"], {
+      uid,
+      email: email,
+      name: values.name,
+      phone: values.phone,
+    })
+    console.log(userInfo);
+
+
+    resetForm()
+    localStorage.setItem("accessToken", accessToken)
+  } catch (err) {
+    throw err
+  }
 }
 </script>
 
@@ -65,7 +84,8 @@ function submit() {
           <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
             Створіть акаунт
           </h1>
-          <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema" v-slot="{ errors }">
+          <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema"
+            v-slot="{ errors, isSubmitting }">
             <div v-for="fieldData in form" :key="fieldData.name">
               <label :for="fieldData.name" class="block mb-2 text-sm font-medium text-white">
                 {{ fieldData.title }}
@@ -75,7 +95,7 @@ function submit() {
                 :class="errors[fieldData.name] && 'border-red-400'" :placeholder="fieldData.placeholder" required />
               <ErrorMessage :name="fieldData.name" class="text-red-400" />
             </div>
-            <button type="submit" class="btn w-full">
+            <button :disabled="isSubmitting" type="submit" class="btn w-full">
               Cтворити акаунт
             </button>
             <p class="text-sm font-light text-turquoise-400">

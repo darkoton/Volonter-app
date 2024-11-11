@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from '@plugins/router.js'
 import { VueFire, VueFireAuth } from 'vuefire'
-import { firebaseApp } from '@/plugins/firebase.js'
+import firebaseApp from '@plugins/firebase'
 import '@/assets/style/style.css'
 
 const app = createApp(App)
