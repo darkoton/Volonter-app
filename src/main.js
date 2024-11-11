@@ -1,11 +1,16 @@
 import { createApp } from 'vue'
-import '@/assets/style/style.css'
 import App from './App.vue'
 import router from '@plugins/router.js'
 import { VueFire, VueFireAuth } from 'vuefire'
 import { firebaseApp } from '@/plugins/firebase.js'
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+import '@/assets/style/style.css'
 
 const app = createApp(App)
+
+// include components
+app.component('VueDatePicker', VueDatePicker);
 
 // include plugins
 app.use(router)

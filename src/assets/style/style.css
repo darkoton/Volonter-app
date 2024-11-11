@@ -266,3 +266,23 @@ body {
     padding-top: 75px;
   }
 }
+
+/* Datapicker */
+
+.dp__main {
+  --dp-background-color: rgb(18 85 93);
+  --dp-border-color: rgb(22 106 116);
+  --dp-border-radius: 0.5rem;
+  --dp-border-color-hover: rgb(230 141 42);
+  --dp-border-color-focus: rgb(230 141 42);
+}
+
+.dp__input {
+  color: #fff;
+}
+
+.dp__input_focus, .dp__input:focus, .dp__input:hover {
+  box-shadow: 0 0 0 1px rgb(230 141 42);
+}
+
+.dp__menu {}
