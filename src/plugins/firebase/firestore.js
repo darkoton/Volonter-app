@@ -2,6 +2,7 @@ import {
   getFirestore,
   collection,
   addDoc,
+  setDoc,
   doc,
   getDoc
 } from 'firebase/firestore';
@@ -13,6 +14,15 @@ const errorDefault = {
   message: "Вибачте, виникла помилка на сервері."
 }
 
+export async function setData(path, body) {
+  try {
+    await setDoc(doc(db, ...path), body);
+  } catch (e) {
+    console.log(e);
+
+    throw errorDefault
+  }
+}
 
 export async function addData(path, body) {
   try {
@@ -21,7 +31,7 @@ export async function addData(path, body) {
   } catch (e) {
     console.log(e);
 
-    return errorDefault
+    throw errorDefault
   }
 }
 
@@ -35,6 +45,8 @@ export async function getData(path, options = {}) {
 
     return querySnapshot.data();
   } catch {
-    return errorDefault
+    console.log(e);
+
+    throw errorDefault
   }
 }

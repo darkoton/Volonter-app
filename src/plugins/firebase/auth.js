@@ -1,8 +1,13 @@
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-// import { addData } from "./firestore.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signOut,
+  signInWithEmailAndPassword
+} from "firebase/auth";
 import app from './index.js';
 
 const auth = getAuth(app);
+
 // Initialize Firebase Authentication and get a reference to the service
 export default auth
 
@@ -13,28 +18,58 @@ export function register(email, password) {
     })
     .catch((error) => {
       const errorCode = error.code;
-      const errorMessage = error.message;
 
       if (errorCode === "auth/invalid-email") {
-        return {
+        throw {
           status: "failed",
           message: "Недійсна електронна адреса."
         }
       } else if (errorCode === "auth/email-already-in-use") {
-        return {
+        throw {
           status: "failed",
           message: "Цей Email вже використовується."
         }
       } else if (errorCode === "auth/weak-password") {
-        return {
+        throw {
           status: "failed",
           message: "Пароль має бути не менше 6 символів."
         }
       } else {
-        return error
+        throw error
       }
-
-
-      // ..
     })
+}
+
+export function login(email, password) {
+  return signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      return userCredential.user
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      if (errorCode === "auth/invalid-value-(email)") {
+        throw {
+          status: "failed",
+          message: "Не правильна електронна адреса."
+        }
+      } else if (errorCode === "auth/invalid-credential") {
+        throw {
+          status: "failed",
+          message: "Недійсні облікові дані."
+        }
+      } else {
+        throw error
+      }
+    });
+}
+
+export function logOut() {
+  return signOut(auth).then(() => {
+    localStorage.removeItem('accessToken')
+  }).catch(() => {
+    throw {
+      status: "failed",
+      message: "Сталася помилка під час виходу."
+    }
+  })
 }

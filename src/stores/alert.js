@@ -1,13 +1,23 @@
 // stores/alert.js
 import { defineStore } from 'pinia'
 
-export const useUserStore = defineStore('alert', {
-  state: {
-    element: null,
-  },
+export const useAlertStore = defineStore('alert', {
+  state: () => ({
+    alert: {
+      message: 'text',
+      visible: false,
+      type: "error"
+    }
+  }),
   actions: {
-    alert() {
+    showAlert(message, type, ms = 3000) {
+      Object.assign(this.alert, { message, type })
 
+      this.alert.visible = true
+
+      setTimeout(() => {
+        this.alert.visible = false
+      }, ms);
     }
   },
 })

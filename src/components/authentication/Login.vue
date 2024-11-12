@@ -2,8 +2,19 @@
 import { Form, Field, ErrorMessage } from 'vee-validate';
 import { useRouter } from 'vue-router'
 import * as yup from 'yup';
+import { useAlertStore } from '@stores/alert.js'
+import { login } from '@plugins/firebase/auth.js'
+import { useUserStore } from '@stores/user.js'
 
+const alertStore = useAlertStore()
 const router = useRouter()
+const userStore = useUserStore()
+
+
+
+if (userStore.authorized) {
+  router.push("/profile")
+}
 
 const schema = yup.object({
   email: yup.string().email("В правильний email").required("Заповніть поле"),
@@ -26,9 +37,15 @@ const form = [
 
 ]
 
-function submit() {
-  console.log('submit')
-  // router.push('/profile')
+async function submit(values, { resetForm }) {
+  try {
+    await login(values.email, values.password)
+    alertStore.showAlert("Ви успішно увійшли до облікового запису!", "success")
+    resetForm()
+    router.push('/profile')
+  } catch (err) {
+    alertStore.showAlert(err.message, "error")
+  }
 }
 </script>
 
@@ -51,7 +68,7 @@ function submit() {
                 :class="errors[fieldData.name] && 'border-red-400'" :placeholder="fieldData.placeholder" required />
               <ErrorMessage :name="fieldData.name" class="text-red-400" />
             </div>
-            <div class="flex items-center justify-between">
+            <!-- <div class="flex items-center justify-between">
               <div class="flex items-start">
                 <div class="flex items-center h-5">
                   <input id="remember" aria-describedby="remember" type="checkbox"
@@ -62,13 +79,17 @@ function submit() {
                   <label for="remember" class="text-turquoise-300">Запам'ятати мене</label>
                 </div>
               </div>
-            </div>
+            </div> -->
             <button :disabled="isSubmitting" type="submit" class="btn w-full">
               Увійти
             </button>
             <p class="text-sm font-light text-turquoise-400">
               Ще не маєте облікового запису?
-              <router-link to="register" class="font-medium link">Зареєструватися</router-link>
+              <router-link :to="{ name: 'user-register' }" class="font-medium link">Зареєструватися</router-link>
+            </p>
+            <p class="text-sm !mt-[5px] font-light text-turquoise-400">
+              Хочете стати волонтером?
+              <router-link :to="{ name: 'volunteer-register' }" class="font-medium link">Стати волонтером</router-link>
             </p>
           </Form>
         </div>

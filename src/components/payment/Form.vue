@@ -5,21 +5,6 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-
-// const format = (date) => {
-//   if (typeof date.getMonth === "function") {
-//     date = new Date(date);
-//   } else {
-//     date = new Date("01/" + date);
-//   }
-//   const month = date.getMonth() + 1;
-//   const year = date.getFullYear();
-
-//   return `${String(month).length > 1 ? month : "0" + month}/${String(
-//     year
-//   ).slice(2, 4)}`;
-// };
-
 const schema = yup.object({
   name: yup.string().trim().required("Заповніть поле"),
   number: yup
@@ -93,42 +78,18 @@ function submit() {
               <div>
                 <label for="date" class="mb-2 block text-sm font-medium text-white">Термін дії картки*</label>
                 <div class="relative">
-                  <!-- <VueDatePicker
-                    :format="format"
-                    v-model="month"
-                    text-input
-                    auto-apply
-                    dark
-                    month-picker
-                  >
-                    <template #input-icon> -->
                   <div
                     class="input-slot-image pointer-events-none inline-block absolute top-[11px] inset-y-0 start-0 ps-3.5">
-                    <svg class="h-4 w-4 text-turquoise-500 dark:text-turquoise-400" aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-4 w-4 text-turquoise-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                      width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                       <path fill-rule="evenodd"
                         d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
                         clip-rule="evenodd" />
                     </svg>
                   </div>
-                  <!-- </template>
-<template #dp-input="{
-                        value,
-                        onInput,
-                        onEnter,
-                        onTab,
-                        onClear,
-                        onBlur,
-                        onKeypress,
-                        onPaste,
-                        isMenuOpen,
-                      }"> -->
                   <Field @input="onInput" :modelValue="value" name="date" id="date" type="text"
                     class="block w-full rounded-lg border p-2.5 ps-9 text-sm border-turquoise-600 bg-turquoise-700 text-white placeholder:text-turquoise-400 focus:border-yellow-600 focus:ring-yellow-600"
                     placeholder="12/23" required />
-                  <!-- </template>
-</VueDatePicker> -->
-
                   <ErrorMessage name="date" class="text-red-400" />
                 </div>
               </div>

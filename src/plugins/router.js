@@ -13,15 +13,36 @@ const routes = [
   { path: "/", component: Home },
   {
     path: "/join",
-    redirect: "/join/login",
+    redirect: "/join/user",
     children: [
       {
+        name: 'login',
         path: 'login',
         component: JoinLogin
       },
       {
-        path: 'register',
-        component: JoinRegister
+        name: 'user',
+        path: 'user',
+        redirect: "/join/user/register",
+        children: [
+          {
+            name: 'user-register',
+            path: 'register',
+            component: JoinRegister
+          }
+        ]
+      },
+      {
+        name: 'volunteer',
+        path: 'volunteer',
+        redirect: "/join/volunteer/register",
+        children: [
+          {
+            name: 'volunteer-register',
+            path: 'register',
+            component: JoinRegister
+          }
+        ]
       }
     ]
   },

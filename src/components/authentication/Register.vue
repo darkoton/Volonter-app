@@ -1,10 +1,30 @@
 <script setup>
+import { computed } from "vue"
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import * as yup from 'yup';
 import { register } from '@plugins/firebase/auth.js'
-import { addData } from '@plugins/firebase/firestore.js'
+import { setData } from '@plugins/firebase/firestore.js'
+import { useAlertStore } from '@stores/alert.js'
+import { useUserStore } from '@stores/user.js'
+
+const { authorized } = useUserStore()
+const alertStore = useAlertStore()
+const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
+
+const typeUser = computed(() => {
+  if (route.name === 'volunteer-register') {
+    return 'volunteer'
+  } else if (route.name === 'user-register') {
+    return 'user'
+  }
+})
+
+if (authorized) {
+  router.push("/profile")
+}
 
 const schema = yup.object({
   name: yup.string().required("Заповніть поле"),
@@ -58,19 +78,21 @@ async function submit(values, { resetForm }) {
     const user = await register(values.email, values.password)
     const { accessToken, uid, email } = user
 
-    const userInfo = await addData(["users"], {
+    const userInfo = await setData(["users", uid], {
       uid,
       email: email,
       name: values.name,
       phone: values.phone,
+      role: typeUser.value,
+      news: false,
+      notification: false
     })
-    console.log(userInfo);
 
-
+    alertStore.showAlert("Ви успішно зареєструвалися як волонтер!", "success")
     resetForm()
-    localStorage.setItem("accessToken", accessToken)
+    router.push('/profile')
   } catch (err) {
-    throw err
+    alertStore.showAlert(err.message, "error")
   }
 }
 </script>
@@ -82,7 +104,8 @@ async function submit(values, { resetForm }) {
       <div class="w-full bg-turquoise-900 rounded-lg shadow border-turquoise-700 sm:max-w-md xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1 class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl">
-            Створіть акаунт
+            {{ typeUser === 'volunteer' ? 'Станьне волонтером' : '' }}
+            {{ typeUser === 'user' ? 'Створіть акаунт' : '' }}
           </h1>
           <Form class="space-y-2 md:space-y-4" @submit="submit" :validation-schema="schema"
             v-slot="{ errors, isSubmitting }">
@@ -99,7 +122,7 @@ async function submit(values, { resetForm }) {
               Cтворити акаунт
             </button>
             <p class="text-sm font-light text-turquoise-400">
-              Вже маєте акаунт? <router-link to="login" class="font-medium link">Увійдіть
+              Вже маєте акаунт? <router-link to="/join/login" class="font-medium link">Увійдіть
                 тут</router-link>
             </p>
           </Form>

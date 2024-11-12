@@ -2,7 +2,9 @@
 import { ref, watch } from 'vue'
 import Logo from '@components/Logo.vue'
 import { Icon } from '@iconify/vue';
+import { useUserStore } from '@stores/user.js'
 
+const userStore = useUserStore()
 const activeMenu = ref(false)
 
 function closeMenu() {
@@ -16,12 +18,9 @@ function closeMenu() {
   <header class="header fixed w-full bg-turquoise-900 z-50 top-0 left-0">
     <div class="container">
       <div class="py-[10px] flex justify-between items-center">
-
-
         <router-link to="/" class="ml-[55px] w-full max-w-[40px] md:max-w-[50px] md:ml-0">
           <Logo width="100%" />
         </router-link>
-
         <nav
           class="flex items-start md:items-center flex-col md:flex-row gap-x-[30px] gap-y-[15px] text-white text-[22px] md:text-[18px] right-full top-0 fixed md:static h-full w-full md:w-auto max-w-[75%] md:max-w-none bg-turquoise-500 md:bg-transparent px-[20px] py-[13px] md:p-0 transition"
           :class='activeMenu && "translate-x-[99.5%] md:translate-x-0"'>
@@ -45,7 +44,13 @@ function closeMenu() {
           </router-link>
         </nav>
 
-        <router-link to="/join" class="text-[16px] md:text-[18px] btn">Долучитись до нас</router-link>
+        <router-link v-if="userStore.authorized" to="/profile"
+          class="text-[16px] md:text-[18px] btn">Профіль</router-link>
+
+        <div v-else class="flex gap-x-[10px]">
+          <router-link to="/join/user" class="text-[16px] md:text-[18px] btn">Зареєструватися</router-link>
+          <router-link to="/join/volunteer" class="text-[16px] md:text-[18px] btn">Стати волонтером</router-link>
+        </div>
       </div>
     </div>
   </header>
