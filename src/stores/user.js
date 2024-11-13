@@ -15,7 +15,7 @@ export const useUserStore = defineStore('user', () => {
   const accessToken = ref(null)
 
   const authorized = computed(() => {
-    return !!(accessToken.value || localStorage.accessToken)
+    return !!((accessToken.value || localStorage.accessToken))
   })
 
   onAuthStateChanged(auth, async (userCredential) => {

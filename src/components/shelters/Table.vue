@@ -22,7 +22,7 @@ function searchInput({ target }) {
 </script>
 
 <template>
-  <section class="shelters ">
+  <section class="shelters">
     <div class="container">
 
       <div class="my-[40px] bg-turquoise-900 relative shadow-md sm:rounded-lg overflow-hidden">

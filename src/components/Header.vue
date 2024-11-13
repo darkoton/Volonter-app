@@ -43,9 +43,11 @@ function closeMenu() {
             Новини
           </router-link>
         </nav>
-
-        <router-link v-if="userStore.authorized" to="/profile"
-          class="text-[16px] md:text-[18px] btn">Профіль</router-link>
+        <div v-if="userStore.authorized && userStore.user" class="flex gap-x-[10px]">
+          <router-link v-if="userStore.user.role === 'admin'" to="/admin"
+            class="text-[16px] md:text-[18px] btn">Адмін</router-link>
+          <router-link to="/profile" class="text-[16px] md:text-[18px] btn">Профіль</router-link>
+        </div>
 
         <div v-else class="flex gap-x-[10px]">
           <router-link to="/join/user" class="text-[16px] md:text-[18px] btn">Зареєструватися</router-link>

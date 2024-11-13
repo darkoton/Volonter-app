@@ -7,7 +7,7 @@ const alertStore = useAlertStore()
 const store = useUserStore()
 const router = useRouter()
 
-if (!store.authorized) {
+if (store.authorized === false) {
   router.push('/join')
 }
 

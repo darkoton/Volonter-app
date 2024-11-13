@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import flowbite from "flowbite/plugin";
+import flowbiteTypography from "flowbite-typography"
 export default {
   darkMode: "class",
   content: [
@@ -7,7 +8,12 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
     "./node_modules/flowbite/**/*.js",
   ],
-  plugins: [flowbite],
+  plugins: [
+    flowbite({
+      wysiwyg: true,
+    }),
+    flowbiteTypography
+  ],
   theme: {
     screens: {
       sm: "640px",

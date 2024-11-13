@@ -1,4 +1,5 @@
 import { createWebHashHistory, createRouter } from "vue-router";
+import { useUserStore } from "@stores/user.js";
 
 import Home from "@pages/Home.vue";
 import JoinLogin from "@pages/Login.vue";
@@ -8,10 +9,22 @@ import Payment from "@pages/Payment.vue";
 import PaymentConfirm from "@pages/PaymentConfirm.vue";
 import Profile from "@pages/Profile.vue";
 import News from "@pages/News.vue";
+import AdminNews from "@pages/AdminNews.vue";
+import AdminNewsEditor from "@pages/AdminNewsEditor.vue";
+
+function adminGuard(to, from, next) {
+  const { authorized } = useUserStore()
+  if (!authorized) {
+    next({ name: 'login' })
+  } else {
+    next()
+  }
+}
 
 const routes = [
-  { path: "/", component: Home },
+  { name: "home", path: "/", component: Home },
   {
+    name: "join",
     path: "/join",
     redirect: "/join/user",
     children: [
@@ -46,11 +59,22 @@ const routes = [
       }
     ]
   },
-  { path: "/shelters", component: Shelters },
-  { path: "/payment", component: Payment },
-  { path: "/payment-confirm", component: PaymentConfirm },
-  { path: "/profile", component: Profile },
-  { path: "/news", component: News },
+  { name: "shelters", path: "/shelters", component: Shelters },
+  { name: "payment", path: "/payment", component: Payment },
+  { name: "payment-confirm", path: "/payment-confirm", component: PaymentConfirm },
+  { name: "profile", path: "/profile", component: Profile },
+  { name: "news", path: "/news", component: News },
+  {
+    name: "admin",
+    path: "/admin",
+    redirect: "/admin/news-list",
+    beforeEnter: [adminGuard],
+    children: [
+      { name: "admin-news-list", path: "news-list", component: AdminNews },
+      { name: "admin-news-create", path: "news-editor", component: AdminNewsEditor },
+      { name: "admin-news-editor", path: "news-editor/:id", component: AdminNewsEditor }
+    ]
+  },
 ];
 
 const router = createRouter({
