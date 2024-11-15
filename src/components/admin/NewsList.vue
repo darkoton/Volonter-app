@@ -83,15 +83,9 @@ onMounted(async () => {
             <tbody v-if="newsFiltred && newsFiltred.length">
               <tr class="border-b border-turquoise-700" v-for="(newItem, index) in newsFiltred" :key="newItem.title">
                 <td scope="row" class="px-4 py-3 font-medium text-white whitespace-nowrap">{{ newItem.title }}</td>
-                <td align="right" class="p-2">
-                  <table>
-                    <tr>
-                      <div class="flex gap-x-[5px]">
-                        <button class="btn ">Змінити</button>
-                        <button @click="deleteItem(index)" class="btn bg-red-500 hover:bg-red-400">Видалити</button>
-                      </div>
-                    </tr>
-                  </table>
+                <td align="right" class="flex gap-x-[5px]">
+                  <button class="btn ">Змінити</button>
+                  <button @click="deleteItem(index)" class="btn bg-red-500 hover:bg-red-400">Видалити</button>
                 </td>
               </tr>
             </tbody>

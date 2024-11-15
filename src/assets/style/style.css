@@ -289,4 +289,8 @@ body {
   box-shadow: 0 0 0 1px rgb(230, 141, 42);
 }
 
-.dp__menu {}
+/* Post editor */
+
+.post-link{
+  @apply text-blue-500;
+}

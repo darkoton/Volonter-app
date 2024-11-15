@@ -1,5 +1,5 @@
 <script setup>
-import Editor from "@components/admin/TextEditor.vue"
+import Editor from "@components/admin/NewsEditor.vue"
 </script>
 
 <template>

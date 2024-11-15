@@ -1,239 +1,12 @@
-<script setup>
-import { Editor } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import Highlight from '@tiptap/extension-highlight';
-import Underline from '@tiptap/extension-underline';
-import Link from '@tiptap/extension-link';
-import TextAlign from '@tiptap/extension-text-align';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
-import Image from '@tiptap/extension-image';
-import YouTube from '@tiptap/extension-youtube';
-import TextStyle from '@tiptap/extension-text-style';
-import FontFamily from '@tiptap/extension-font-family';
-import { Color } from '@tiptap/extension-color';
-import Bold from '@tiptap/extension-bold';
-import { onMounted } from 'vue';
-
-onMounted(() => {
-  window.addEventListener('load', function () {
-    if (document.getElementById("wysiwyg-example")) {
-
-      const FontSizeTextStyle = TextStyle.extend({
-        addAttributes() {
-          return {
-            fontSize: {
-              default: null,
-              parseHTML: element => element.style.fontSize,
-              renderHTML: attributes => {
-                if (!attributes.fontSize) {
-                  return {};
-                }
-                return { style: 'font-size: ' + attributes.fontSize };
-              },
-            },
-          };
-        },
-      });
-      const CustomBold = Bold.extend({
-        // Override the renderHTML method
-        renderHTML({ mark, HTMLAttributes }) {
-          const { style, ...rest } = HTMLAttributes;
-
-          // Merge existing styles with font-weight
-          const newStyle = 'font-weight: bold;' + (style ? ' ' + style : '');
-
-          return ['span', { ...rest, style: newStyle.trim() }, 0];
-        },
-        // Ensure it doesn't exclude other marks
-        addOptions() {
-          return {
-            ...this.parent?.(),
-            HTMLAttributes: {},
-          };
-        },
-      });
-      // tip tap editor setup
-      const editor = new Editor({
-        element: document.querySelector('#wysiwyg-example'),
-        extensions: [
-          // Exclude the default Bold mark
-          StarterKit.configure({
-            marks: {
-              bold: false,
-            },
-          }),
-          // Include the custom Bold extension
-          CustomBold,
-          TextStyle,
-          Color,
-          FontSizeTextStyle,
-          FontFamily,
-          Highlight,
-          Underline,
-          Link.configure({
-            openOnClick: false,
-            autolink: true,
-            defaultProtocol: 'https',
-          }),
-          TextAlign.configure({
-            types: ['heading', 'paragraph'],
-          }),
-          HorizontalRule,
-          Image,
-          YouTube,
-        ],
-        content: '<p>Flowbite is an <strong>open-source library of UI components</strong> based on the utility-first Tailwind CSS framework featuring dark mode support, a Figma design system, and more.</p><p>It includes all of the commonly used components that a website requires, such as buttons, dropdowns, navigation bars, modals, datepickers, advanced charts and the list goes on.</p><p>Here is an example of a button component:</p><code>&#x3C;button type=&#x22;button&#x22; class=&#x22;text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800&#x22;&#x3E;Default&#x3C;/button&#x3E;</code><p>Learn more about all components from the <a href="https://flowbite.com/docs/getting-started/introduction/">Flowbite Docs</a>.</p>',
-        editorProps: {
-          attributes: {
-            class: 'format lg:format-lg dark:format-invert focus:outline-none format-blue max-w-none',
-          },
-        }
-      });
-
-      // set up custom event listeners for the buttons
-      document.getElementById('toggleBoldButton').addEventListener('click', () => editor.chain().focus().toggleBold().run());
-      document.getElementById('toggleItalicButton').addEventListener('click', () => editor.chain().focus().toggleItalic().run());
-      document.getElementById('toggleUnderlineButton').addEventListener('click', () => editor.chain().focus().toggleUnderline().run());
-      document.getElementById('toggleStrikeButton').addEventListener('click', () => editor.chain().focus().toggleStrike().run());
-      document.getElementById('toggleHighlightButton').addEventListener('click', () => {
-        const isHighlighted = editor.isActive('highlight');
-        // when using toggleHighlight(), judge if is is already highlighted.
-        editor.chain().focus().toggleHighlight({
-          color: isHighlighted ? undefined : '#ffc078' // if is already highlighted，unset the highlight color
-        }).run();
-      });
-
-      document.getElementById('toggleLinkButton').addEventListener('click', () => {
-        const url = window.prompt('Enter image URL:', 'https://flowbite.com');
-        editor.chain().focus().toggleLink({ href: url }).run();
-      });
-      document.getElementById('removeLinkButton').addEventListener('click', () => {
-        editor.chain().focus().unsetLink().run()
-      });
-      document.getElementById('toggleCodeButton').addEventListener('click', () => {
-        editor.chain().focus().toggleCode().run();
-      })
-
-      document.getElementById('toggleLeftAlignButton').addEventListener('click', () => {
-        editor.chain().focus().setTextAlign('left').run();
-      });
-      document.getElementById('toggleCenterAlignButton').addEventListener('click', () => {
-        editor.chain().focus().setTextAlign('center').run();
-      });
-      document.getElementById('toggleRightAlignButton').addEventListener('click', () => {
-        editor.chain().focus().setTextAlign('right').run();
-      });
-      document.getElementById('toggleListButton').addEventListener('click', () => {
-        editor.chain().focus().toggleBulletList().run();
-      });
-      document.getElementById('toggleOrderedListButton').addEventListener('click', () => {
-        editor.chain().focus().toggleOrderedList().run();
-      });
-      document.getElementById('toggleBlockquoteButton').addEventListener('click', () => {
-        editor.chain().focus().toggleBlockquote().run();
-      });
-      document.getElementById('toggleHRButton').addEventListener('click', () => {
-        editor.chain().focus().setHorizontalRule().run();
-      });
-      document.getElementById('addImageButton').addEventListener('click', () => {
-        const url = window.prompt('Enter image URL:', 'https://placehold.co/600x400');
-        if (url) {
-          editor.chain().focus().setImage({ src: url }).run();
-        }
-      });
-      document.getElementById('addVideoButton').addEventListener('click', () => {
-        const url = window.prompt('Enter YouTube URL:', 'https://www.youtube.com/watch?v=KaLxCiilHns');
-        if (url) {
-          editor.commands.setYoutubeVideo({
-            src: url,
-            width: 640,
-            height: 480,
-          })
-        }
-      });
-
-      // typography dropdown
-      const typographyDropdown = FlowbiteInstances.getInstance('Dropdown', 'typographyDropdown');
-
-      document.getElementById('toggleParagraphButton').addEventListener('click', () => {
-        editor.chain().focus().setParagraph().run();
-        typographyDropdown.hide();
-      });
-
-      document.querySelectorAll('[data-heading-level]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const level = button.getAttribute('data-heading-level');
-          editor.chain().focus().toggleHeading({ level: parseInt(level) }).run()
-          typographyDropdown.hide();
-        });
-      });
-
-      const textSizeDropdown = FlowbiteInstances.getInstance('Dropdown', 'textSizeDropdown');
-
-      // Loop through all elements with the data-text-size attribute
-      document.querySelectorAll('[data-text-size]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const fontSize = button.getAttribute('data-text-size');
-
-          // Apply the selected font size via pixels using the TipTap editor chain
-          editor.chain().focus().setMark('textStyle', { fontSize }).run();
-
-          // Hide the dropdown after selection
-          textSizeDropdown.hide();
-        });
-      });
-
-      // Listen for color picker changes
-      const colorPicker = document.getElementById('color');
-      colorPicker.addEventListener('input', (event) => {
-        const selectedColor = event.target.value;
-
-        // Apply the selected color to the selected text
-        editor.chain().focus().setColor(selectedColor).run();
-      })
-
-      document.querySelectorAll('[data-hex-color]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const selectedColor = button.getAttribute('data-hex-color');
-
-          // Apply the selected color to the selected text
-          editor.chain().focus().setColor(selectedColor).run();
-        });
-      });
-
-      document.getElementById('reset-color').addEventListener('click', () => {
-        editor.commands.unsetColor();
-      })
-
-      const fontFamilyDropdown = FlowbiteInstances.getInstance('Dropdown', 'fontFamilyDropdown');
-
-      // Loop through all elements with the data-font-family attribute
-      document.querySelectorAll('[data-font-family]').forEach((button) => {
-        button.addEventListener('click', () => {
-          const fontFamily = button.getAttribute('data-font-family');
-
-          // Apply the selected font size via pixels using the TipTap editor chain
-          editor.chain().focus().setFontFamily(fontFamily).run();
-
-          // Hide the dropdown after selection
-          fontFamilyDropdown.hide();
-        });
-      });
-    }
-  })
-})
-</script>
-
 <template>
   <div class="editor">
-    <div class="container">
-      <div
-        class="w-full border border-turquoise-200 rounded-lg bg-turquoise-50 dark:bg-turquoise-700 dark:border-turquoise-600">
+    <div class="py-[30px]">
+      <div v-if="editor" class="border rounded-lg dark:bg-turquoise-700 dark:border-turquoise-600">
         <div class="px-3 py-2 border-b dark:border-turquoise-600">
           <div class="flex flex-wrap items-center">
             <div class="flex items-center space-x-1 rtl:space-x-reverse flex-wrap">
-              <button id="toggleBoldButton" data-tooltip-target="tooltip-bold" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleBoldButton" @click="toggleBold" data-tooltip-target="tooltip-bold" type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -242,12 +15,12 @@ onMounted(() => {
                 <span class="sr-only">Bold</span>
               </button>
               <div id="tooltip-bold" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Toggle bold
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleItalicButton" data-tooltip-target="tooltip-italic" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleItalicButton" @click="toggleItalic" data-tooltip-target="tooltip-italic" type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,12 +29,13 @@ onMounted(() => {
                 <span class="sr-only">Italic</span>
               </button>
               <div id="tooltip-italic" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Toggle italic
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleUnderlineButton" data-tooltip-target="tooltip-underline" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleUnderlineButton" @click="toggleUnderline" data-tooltip-target="tooltip-underline"
+                type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -270,12 +44,12 @@ onMounted(() => {
                 <span class="sr-only">Underline</span>
               </button>
               <div id="tooltip-underline" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Toggle underline
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleStrikeButton" data-tooltip-target="tooltip-strike" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleStrikeButton" @click="toggleStrike" data-tooltip-target="tooltip-strike" type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -284,12 +58,13 @@ onMounted(() => {
                 <span class="sr-only">Strike</span>
               </button>
               <div id="tooltip-strike" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Toggle strike
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleHighlightButton" data-tooltip-target="tooltip-highlight" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleHighlightButton" @click="toggleHighlight" data-tooltip-target="tooltip-highlight"
+                type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -298,12 +73,12 @@ onMounted(() => {
                 <span class="sr-only">Highlight</span>
               </button>
               <div id="tooltip-highlight" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Toggle highlight
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleCodeButton" type="button" data-tooltip-target="tooltip-code"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleCodeButton" @click="toggleCodeBlock" type="button" data-tooltip-target="tooltip-code"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -312,12 +87,12 @@ onMounted(() => {
                 <span class="sr-only">Code</span>
               </button>
               <div id="tooltip-code" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Format code
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleLinkButton" data-tooltip-target="tooltip-link" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="toggleLinkButton" @click="toggleLink" data-tooltip-target="tooltip-link" type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -326,12 +101,12 @@ onMounted(() => {
                 <span class="sr-only">Link</span>
               </button>
               <div id="tooltip-link" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Add link
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="removeLinkButton" data-tooltip-target="tooltip-remove-link" type="button"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button id="removeLinkButton" @click="removeLink" data-tooltip-target="tooltip-remove-link" type="button"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -340,13 +115,13 @@ onMounted(() => {
                 <span class="sr-only">Remove link</span>
               </button>
               <div id="tooltip-remove-link" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Remove link
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
               <button id="toggleTextSizeButton" data-dropdown-toggle="textSizeDropdown" type="button"
                 data-tooltip-target="tooltip-text-size"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -355,45 +130,45 @@ onMounted(() => {
                 <span class="sr-only">Text size</span>
               </button>
               <div id="tooltip-text-size" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Text size
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <div id="textSizeDropdown" class="z-10 hidden w-72 rounded bg-white p-2 shadow dark:bg-turquoise-700">
+              <div id="textSizeDropdown" class="z-10 hidden w-72 rounded bg-white p-2 shadow dark:bg-turquoise-900">
                 <ul class="space-y-1 text-sm font-medium" aria-labelledby="toggleTextSizeButton">
                   <li>
-                    <button data-text-size="16px" type="button"
-                      class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">16px
+                    <button @click="setFontSize('16px')" type="button"
+                      class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">16px
                       (Default)
                     </button>
                   </li>
                   <li>
-                    <button data-text-size="12px" type="button"
-                      class="flex justify-between items-center w-full text-xs rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">12px
+                    <button @click="setFontSize('12px')" type="button"
+                      class="flex justify-between items-center w-full text-xs rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">12px
                       (Tiny)
                     </button>
                   </li>
                   <li>
-                    <button data-text-size="14px" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">14px
+                    <button @click="setFontSize('14px')" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">14px
                       (Small)
                     </button>
                   </li>
                   <li>
-                    <button data-text-size="18px" type="button"
-                      class="flex justify-between items-center w-full text-lg rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">18px
+                    <button @click="setFontSize('18px')" type="button"
+                      class="flex justify-between items-center w-full text-lg rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">18px
                       (Lead)
                     </button>
                   </li>
                   <li>
-                    <button data-text-size="24px" type="button"
-                      class="flex justify-between items-center w-full text-2xl rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">24px
+                    <button @click="setFontSize('24px')" type="button"
+                      class="flex justify-between items-center w-full text-2xl rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">24px
                       (Large)
                     </button>
                   </li>
                   <li>
-                    <button data-text-size="36px" type="button"
-                      class="flex justify-between items-center w-full text-4xl rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">36px
+                    <button @click="setFontSize('36px')" type="button"
+                      class="flex justify-between items-center w-full text-4xl rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">36px
                       (Huge)
                     </button>
                   </li>
@@ -401,7 +176,7 @@ onMounted(() => {
               </div>
               <button id="toggleTextColorButton" data-dropdown-toggle="textColorDropdown" type="button"
                 data-tooltip-target="tooltip-text-color"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="25" height="24"
                   fill="none" viewBox="0 0 25 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -410,100 +185,100 @@ onMounted(() => {
                 <span class="sr-only">Text color</span>
               </button>
               <div id="tooltip-text-color" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Text color
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <div id="textColorDropdown" class="z-10 hidden w-48 rounded bg-white p-2 shadow dark:bg-turquoise-700">
+              <div id="textColorDropdown" class="z-10 hidden w-48 rounded bg-white p-2 shadow dark:bg-turquoise-900">
                 <div
-                  class="grid grid-cols-6 gap-2 group mb-3 items-center p-1.5 rounded-lg hover:bg-turquoise-100 dark:hover:bg-turquoise-600">
-                  <input type="color" id="color" value="#e66465"
-                    class="border-turquoise-200 border bg-turquoise-50 dark:bg-turquoise-700 dark:border-turquoise-600 rounded-md p-px px-1 hover:bg-turquoise-50 group-hover:bg-turquoise-50 dark:group-hover:bg-turquoise-700 w-full h-8 col-span-3" />
+                  class="grid grid-cols-6 gap-2 group mb-3 items-center p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-turquoise-600">
+                  <input @input="setColorPicker" type="color" id="color" value="#e66465"
+                    class="border-gray-200 border bg-gray-50 dark:bg-turquoise-700 dark:border-turquoise-600 rounded-md p-px px-1 hover:bg-gray-50 group-hover:bg-gray-50 dark:group-hover:bg-turquoise-700 w-full h-8 col-span-3" />
                   <label for="color"
-                    class="text-turquoise-500 dark:text-turquoise-400 text-sm font-medium col-span-3 group-hover:text-turquoise-900 dark:group-hover:text-white">Pick
+                    class="text-turquoise-500 dark:text-turquoise-400 text-sm font-medium col-span-3 group-hover:text-turquoise-100 dark:group-hover:text-white">Pick
                     a color</label>
                 </div>
                 <div class="grid grid-cols-6 gap-1 mb-3">
-                  <button type="button" data-hex-color="#1A56DB" style="background-color: #1A56DB"
+                  <button type="button" @click="setColor('#1A56DB')" style="background-color: #1A56DB"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Blue</span></button>
-                  <button type="button" data-hex-color="#0E9F6E" style="background-color: #0E9F6E"
+                  <button type="button" @click="setColor('#0E9F6E')" style="background-color: #0E9F6E"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Green</span></button>
-                  <button type="button" data-hex-color="#FACA15" style="background-color: #FACA15"
+                  <button type="button" @click="setColor('#FACA15')" style="background-color: #FACA15"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Yellow</span></button>
-                  <button type="button" data-hex-color="#F05252" style="background-color: #F05252"
+                  <button type="button" @click="setColor('#F05252')" style="background-color: #F05252"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Red</span></button>
-                  <button type="button" data-hex-color="#FF8A4C" style="background-color: #FF8A4C"
+                  <button type="button" @click="setColor('#FF8A4C')" style="background-color: #FF8A4C"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Orange</span></button>
-                  <button type="button" data-hex-color="#0694A2" style="background-color: #0694A2"
+                  <button type="button" @click="setColor('#0694A2')" style="background-color: #0694A2"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Teal</span></button>
-                  <button type="button" data-hex-color="#B4C6FC" style="background-color: #B4C6FC"
+                  <button type="button" @click="setColor('#B4C6FC')" style="background-color: #B4C6FC"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light indigo</span></button>
-                  <button type="button" data-hex-color="#8DA2FB" style="background-color: #8DA2FB"
+                  <button type="button" @click="setColor('#8DA2FB')" style="background-color: #8DA2FB"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Indigo</span></button>
-                  <button type="button" data-hex-color="#5145CD" style="background-color: #5145CD"
+                  <button type="button" @click="setColor('#5145CD')" style="background-color: #5145CD"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Purple</span></button>
-                  <button type="button" data-hex-color="#771D1D" style="background-color: #771D1D"
+                  <button type="button" @click="setColor('#771D1D')" style="background-color: #771D1D"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Brown</span></button>
-                  <button type="button" data-hex-color="#FCD9BD" style="background-color: #FCD9BD"
+                  <button type="button" @click="setColor('#FCD9BD')" style="background-color: #FCD9BD"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light orange</span></button>
-                  <button type="button" data-hex-color="#99154B" style="background-color: #99154B"
+                  <button type="button" @click="setColor('#99154B')" style="background-color: #99154B"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Bordo</span></button>
-                  <button type="button" data-hex-color="#7E3AF2" style="background-color: #7E3AF2"
+                  <button type="button" @click="setColor('#7E3AF2')" style="background-color: #7E3AF2"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Dark Purple</span></button>
-                  <button type="button" data-hex-color="#CABFFD" style="background-color: #CABFFD"
+                  <button type="button" @click="setColor('#CABFFD')" style="background-color: #CABFFD"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light</span></button>
-                  <button type="button" data-hex-color="#D61F69" style="background-color: #D61F69"
+                  <button type="button" @click="setColor('#D61F69')" style="background-color: #D61F69"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Dark Pink</span></button>
-                  <button type="button" data-hex-color="#F8B4D9" style="background-color: #F8B4D9"
+                  <button type="button" @click="setColor('#F8B4D9')" style="background-color: #F8B4D9"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Pink</span></button>
-                  <button type="button" data-hex-color="#F6C196" style="background-color: #F6C196"
+                  <button type="button" @click="setColor('#F6C196')" style="background-color: #F6C196"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Cream</span></button>
-                  <button type="button" data-hex-color="#A4CAFE" style="background-color: #A4CAFE"
+                  <button type="button" @click="setColor('#A4CAFE')" style="background-color: #A4CAFE"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light Blue</span></button>
-                  <button type="button" data-hex-color="#5145CD" style="background-color: #5145CD"
+                  <button type="button" @click="setColor('#5145CD')" style="background-color: #5145CD"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Dark Blue</span></button>
-                  <button type="button" data-hex-color="#B43403" style="background-color: #B43403"
+                  <button type="button" @click="setColor('#B43403')" style="background-color: #B43403"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Orange Brown</span></button>
-                  <button type="button" data-hex-color="#FCE96A" style="background-color: #FCE96A"
+                  <button type="button" @click="setColor('#FCE96A')" style="background-color: #FCE96A"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light Yellow</span></button>
-                  <button type="button" data-hex-color="#1E429F" style="background-color: #1E429F"
+                  <button type="button" @click="setColor('#1E429F')" style="background-color: #1E429F"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Navy Blue</span></button>
-                  <button type="button" data-hex-color="#768FFD" style="background-color: #768FFD"
+                  <button type="button" @click="setColor('#768FFD')" style="background-color: #768FFD"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light Purple</span></button>
-                  <button type="button" data-hex-color="#BCF0DA" style="background-color: #BCF0DA"
+                  <button type="button" @click="setColor('#BCF0DA')" style="background-color: #BCF0DA"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Light Green</span></button>
-                  <button type="button" data-hex-color="#EBF5FF" style="background-color: #EBF5FF"
+                  <button type="button" @click="setColor('#EBF5FF')" style="background-color: #EBF5FF"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Sky Blue</span></button>
-                  <button type="button" data-hex-color="#16BDCA" style="background-color: #16BDCA"
+                  <button type="button" @click="setColor('#16BDCA')" style="background-color: #16BDCA"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Cyan</span></button>
-                  <button type="button" data-hex-color="#E74694" style="background-color: #E74694"
+                  <button type="button" @click="setColor('#E74694')" style="background-color: #E74694"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Pink</span></button>
-                  <button type="button" data-hex-color="#83B0ED" style="background-color: #83B0ED"
+                  <button type="button" @click="setColor('#83B0ED')" style="background-color: #83B0ED"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Darker Sky Blue</span></button>
-                  <button type="button" data-hex-color="#03543F" style="background-color: #03543F"
+                  <button type="button" @click="setColor('#03543F')" style="background-color: #03543F"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Forest Green</span></button>
-                  <button type="button" data-hex-color="#111928" style="background-color: #111928"
+                  <button type="button" @click="setColor('#111928')" style="background-color: #111928"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Black</span></button>
-                  <button type="button" data-hex-color="#4B5563" style="background-color: #4B5563"
+                  <button type="button" @click="setColor('#4B5563')" style="background-color: #4B5563"
                     class="w-6 h-6 rounded-md"><span class="sr-only">Stone</span></button>
-                  <button type="button" data-hex-color="#6B7280" style="background-color: #6B7280"
-                    class="w-6 h-6 rounded-md"><span class="sr-only">turquoise</span></button>
-                  <button type="button" data-hex-color="#D1D5DB" style="background-color: #D1D5DB"
-                    class="w-6 h-6 rounded-md"><span class="sr-only">Light turquoise</span></button>
-                  <button type="button" data-hex-color="#F3F4F6" style="background-color: #F3F4F6"
-                    class="w-6 h-6 rounded-md"><span class="sr-only">Cloud turquoise</span></button>
-                  <button type="button" data-hex-color="#F3F4F6" style="background-color: #F3F4F6"
-                    class="w-6 h-6 rounded-md"><span class="sr-only">Cloud turquoise</span></button>
-                  <button type="button" data-hex-color="#F9FAFB" style="background-color: #F9FAFB"
-                    class="w-6 h-6 rounded-md"><span class="sr-only">Heaven turquoise</span></button>
+                  <button type="button" @click="setColor('#6B7280')" style="background-color: #6B7280"
+                    class="w-6 h-6 rounded-md"><span class="sr-only">Gray</span></button>
+                  <button type="button" @click="setColor('#D1D5DB')" style="background-color: #D1D5DB"
+                    class="w-6 h-6 rounded-md"><span class="sr-only">Light Gray</span></button>
+                  <button type="button" @click="setColor('#F3F4F6')" style="background-color: #F3F4F6"
+                    class="w-6 h-6 rounded-md"><span class="sr-only">Cloud Gray</span></button>
+                  <button type="button" @click="setColor('#F3F4F6')" style="background-color: #F3F4F6"
+                    class="w-6 h-6 rounded-md"><span class="sr-only">Cloud Gray</span></button>
+                  <button type="button" @click="setColor('#F9FAFB')" style="background-color: #F9FAFB"
+                    class="w-6 h-6 rounded-md"><span class="sr-only">Heaven Gray</span></button>
                 </div>
-                <button type="button" id="reset-color"
-                  class="py-1.5 text-sm font-medium text-turquoise-500 focus:outline-none bg-white rounded-lg hover:bg-turquoise-100 hover:text-turquoise-900 focus:z-10 focus:ring-4 focus:ring-turquoise-100 dark:focus:ring-turquoise-700 dark:bg-turquoise-700 dark:text-turquoise-400 dark:hover:text-white w-full dark:hover:bg-turquoise-600">Reset
+                <button type="button" @click="resetColor" id="reset-color"
+                  class="py-1.5 text-sm font-medium text-turquoise-500 focus:outline-none bg-white rounded-lg hover:bg-gray-100 hover:text-turquoise-100 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-turquoise-700 dark:bg-turquoise-700 dark:text-turquoise-400 dark:hover:text-white w-full dark:hover:bg-turquoise-600">Reset
                   color</button>
               </div>
               <button id="toggleFontFamilyButton" data-dropdown-toggle="fontFamilyDropdown" type="button"
                 data-tooltip-target="tooltip-font-family"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -512,72 +287,73 @@ onMounted(() => {
                 <span class="sr-only">Font family</span>
               </button>
               <div id="tooltip-font-family" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Font Family
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <div id="fontFamilyDropdown" class="z-10 hidden w-48 rounded bg-white p-2 shadow dark:bg-turquoise-700">
+              <div id="fontFamilyDropdown" class="z-10 hidden w-48 rounded bg-white p-2 shadow dark:bg-turquoise-900">
                 <ul class="space-y-1 text-sm font-medium" aria-labelledby="toggleFontFamilyButton">
                   <li>
-                    <button data-font-family="Inter, ui-sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm font-sans rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Default
+                    <button @click="setFontFamily('Inter, ui-sans-serif')" type="button"
+                      class="flex justify-between items-center w-full text-sm font-sans rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white">Default
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="Arial, sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily('Arial, sans-serif')" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: Arial, sans-serif;">Arial
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="'Courier New', monospace" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily(`'Courier New', monospace`)" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: 'Courier New', monospace;">Courier New
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="Georgia, serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily('Georgia, serif')" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: Georgia, serif;">Georgia
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="'Lucida Sans Unicode', sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily(`'Lucida Sans Unicode', sans-serif`)" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: 'Lucida Sans Unicode', sans-serif;">Lucida Sans Unicode
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="Tahoma, sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily('Tahoma, sans-serif')" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: Tahoma, sans-serif;">Tahoma
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="'Times New Roman', serif;" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily(`'Times New Roman', serif;`)" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: 'Times New Roman', serif;">Times New Roman
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="'Trebuchet MS', sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily(`'Trebuchet MS', sans-serif`)" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS
                     </button>
                   </li>
                   <li>
-                    <button data-font-family="Verdana, sans-serif" type="button"
-                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white"
+                    <button @click="setFontFamily('Verdana, sans-serif')" type="button"
+                      class="flex justify-between items-center w-full text-sm rounded px-3 py-2 hover:bg-gray-100 text-turquoise-100 dark:hover:bg-turquoise-600 dark:text-white"
                       style="font-family: Verdana, sans-serif;">Verdana
                     </button>
                   </li>
                 </ul>
               </div>
               <div class="px-1">
-                <span class="block w-px h-4 bg-turquoise-300 dark:bg-turquoise-600"></span>
+                <span class="block w-px h-4 bg-gray-300 dark:bg-turquoise-600"></span>
               </div>
-              <button id="toggleLeftAlignButton" type="button" data-tooltip-target="tooltip-left-align"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button @click="setTextLeft" id="toggleLeftAlignButton" type="button"
+                data-tooltip-target="tooltip-left-align"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -586,12 +362,13 @@ onMounted(() => {
                 <span class="sr-only">Align left</span>
               </button>
               <div id="tooltip-left-align" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Align left
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleCenterAlignButton" type="button" data-tooltip-target="tooltip-center-align"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button @click="setTextCenter" id="toggleCenterAlignButton" type="button"
+                data-tooltip-target="tooltip-center-align"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -600,12 +377,13 @@ onMounted(() => {
                 <span class="sr-only">Align center</span>
               </button>
               <div id="tooltip-center-align" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Align center
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
-              <button id="toggleRightAlignButton" type="button" data-tooltip-target="tooltip-right-align"
-                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              <button @click="setTextRight" id="toggleRightAlignButton" type="button"
+                data-tooltip-target="tooltip-right-align"
+                class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -614,130 +392,15 @@ onMounted(() => {
                 <span class="sr-only">Align right</span>
               </button>
               <div id="tooltip-right-align" role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
                 Align right
                 <div class="tooltip-arrow" data-popper-arrow></div>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-2 pt-2 flex-wrap">
-            <button id="typographyDropdownButton" data-dropdown-toggle="typographyDropdown"
-              class="flex items-center justify-center rounded-lg bg-turquoise-100 px-3 py-1.5 text-sm font-medium text-turquoise-500 hover:bg-turquoise-200 hover:text-turquoise-900 focus:z-10 focus:outline-none focus:ring-4 focus:ring-turquoise-50 dark:bg-turquoise-600 dark:text-turquoise-400 dark:hover:bg-turquoise-500 dark:hover:text-white dark:focus:ring-turquoise-600"
-              type="button">
-              Format
-              <svg class="-me-0.5 ms-1.5 h-3.5 w-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="m19 9-7 7-7-7" />
-              </svg>
-            </button>
-            <div class="ps-1.5">
-              <span class="block w-px h-4 bg-turquoise-300 dark:bg-turquoise-600"></span>
-            </div>
-            <!-- Heading Dropdown -->
-            <div id="typographyDropdown" class="z-10 hidden w-72 rounded bg-white p-2 shadow dark:bg-turquoise-700">
-              <ul class="space-y-1 text-sm font-medium" aria-labelledby="typographyDropdownButton">
-                <li>
-                  <button id="toggleParagraphButton" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Paragraph
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">0</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="1" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    1
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">1</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="2" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    2
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">2</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="3" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    3
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">3</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="4" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    4
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">4</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="5" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    5
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">5</kbd>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-heading-level="6" type="button"
-                    class="flex justify-between items-center w-full text-base rounded px-3 py-2 hover:bg-turquoise-100 text-turquoise-900 dark:hover:bg-turquoise-600 dark:text-white">Heading
-                    6
-                    <div class="space-x-1.5">
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Cmd</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">Alt</kbd>
-                      <kbd
-                        class="px-2 py-1 text-xs font-semibold text-turquoise-500 bg-turquoise-100 border border-turquoise-200 rounded-lg dark:bg-turquoise-600 dark:text-turquoise-400 dark:border-turquoise-500">6</kbd>
-                    </div>
-                  </button>
-                </li>
-              </ul>
-            </div>
             <button id="addImageButton" type="button" data-tooltip-target="tooltip-image"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z"
@@ -749,12 +412,12 @@ onMounted(() => {
               <span class="sr-only">Add image</span>
             </button>
             <div id="tooltip-image" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Add image
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
             <button id="addVideoButton" type="button" data-tooltip-target="tooltip-video"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd"
@@ -764,12 +427,12 @@ onMounted(() => {
               <span class="sr-only">Add video</span>
             </button>
             <div id="tooltip-video" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Add video
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
-            <button id="toggleListButton" type="button" data-tooltip-target="tooltip-list"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+            <button @click="toggleBulletList()" id="toggleListButton" type="button" data-tooltip-target="tooltip-list"
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -778,12 +441,13 @@ onMounted(() => {
               <span class="sr-only">Toggle list</span>
             </button>
             <div id="tooltip-list" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Toggle list
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
-            <button id="toggleOrderedListButton" type="button" data-tooltip-target="tooltip-ordered-list"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+            <button @click="toggleOrderedList()" id="toggleOrderedListButton" type="button"
+              data-tooltip-target="tooltip-ordered-list"
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -792,12 +456,13 @@ onMounted(() => {
               <span class="sr-only">Toggle ordered list</span>
             </button>
             <div id="tooltip-ordered-list" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Toggle ordered list
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
-            <button id="toggleBlockquoteButton" type="button" data-tooltip-target="tooltip-blockquote-list"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+            <!-- <button @click="toggleBlockquote()" id="toggleBlockquoteButton" type="button"
+              data-tooltip-target="tooltip-blockquote-list"
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="currentColor" viewBox="0 0 24 24">
                 <path fill-rule="evenodd"
@@ -807,12 +472,12 @@ onMounted(() => {
               <span class="sr-only">Toggle blockquote</span>
             </button>
             <div id="tooltip-blockquote-list" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Toggle blockquote
               <div class="tooltip-arrow" data-popper-arrow></div>
-            </div>
-            <button id="toggleHRButton" type="button" data-tooltip-target="tooltip-hr-list"
-              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-900 hover:bg-turquoise-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
+            </div> -->
+            <button @click="toggleHR()" id="toggleHRButton" type="button" data-tooltip-target="tooltip-hr-list"
+              class="p-1.5 text-turquoise-500 rounded cursor-pointer hover:text-turquoise-100 hover:bg-gray-100 dark:text-turquoise-400 dark:hover:text-white dark:hover:bg-turquoise-600">
               <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="currentColor" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 12h14" />
@@ -822,20 +487,206 @@ onMounted(() => {
               <span class="sr-only">Toggle Horizontal Rule</span>
             </button>
             <div id="tooltip-hr-list" role="tooltip"
-              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-700">
+              class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-turquoise-100 rounded-lg shadow-sm opacity-0 tooltip dark:bg-turquoise-600">
               Toggle Horizontal Rule
               <div class="tooltip-arrow" data-popper-arrow></div>
             </div>
           </div>
         </div>
-        <div class="px-4 py-2 bg-white rounded-b-lg dark:bg-turquoise-800">
-          <label for="wysiwyg-example" class="sr-only">Publish post</label>
-          <div id="wysiwyg-example"
-            class="block w-full px-0 text-sm text-turquoise-800 bg-white border-0 dark:bg-turquoise-800 focus:ring-0 dark:text-white dark:placeholder-turquoise-400">
-          </div>
-        </div>
+        <editor-content
+          class="p-[10px] list-disc tiptap ProseMirror format lg:format-lg format-invert focus:outline-none format-blue max-w-none"
+          :editor="editor" />
       </div>
     </div>
   </div>
-
 </template>
+
+<script setup>
+import { onBeforeUnmount, watch, ref, onMounted } from "vue"
+import StarterKit from '@tiptap/starter-kit'
+import { Editor, EditorContent } from '@tiptap/vue-3'
+import Underline from '@tiptap/extension-underline'
+import Highlight from '@tiptap/extension-highlight'
+import Link from '@tiptap/extension-link'
+import TextStyle from '@tiptap/extension-text-style'
+import FontFamily from '@tiptap/extension-font-family'
+import { Color } from '@tiptap/extension-color';
+import TextAlign from '@tiptap/extension-text-align';
+import HorizontalRule from "@tiptap/extension-horizontal-rule"
+import Bold from "@tiptap/extension-bold"
+import { initDropdowns } from "flowbite"
+
+const { modelValue } = defineProps({
+  modelValue: {
+    type: String,
+    default: ''
+  }
+})
+
+const $emit = defineEmits(['update:modelValue'])
+
+const editor = ref(null)
+watch(() => modelValue, value => {
+  const isSame = editor.value.getHTML() === value
+
+  // JSON
+  // const isSame = JSON.stringify(editor.value.getJSON()) === JSON.stringify(value)
+
+  if (isSame) {
+    return
+  }
+
+  editor.value.commands.setContent(value, false)
+})
+
+
+const FontSizeTextStyle = TextStyle.extend({
+  addAttributes() {
+    return {
+      fontSize: {
+        default: null,
+        parseHTML: element => element.style.fontSize,
+        renderHTML: attributes => {
+          if (!attributes.fontSize) {
+            return {};
+          }
+          return { style: 'font-size: ' + attributes.fontSize };
+        },
+      },
+    };
+  },
+});
+
+const CustomBold = Bold.extend({
+  // Override the renderHTML method
+  renderHTML({ mark, HTMLAttributes }) {
+    const { style, ...rest } = HTMLAttributes;
+
+    // Merge existing styles with font-weight
+    const newStyle = 'font-weight: bold;' + (style ? ' ' + style : '');
+
+    return ['span', { ...rest, style: newStyle.trim() }, 0];
+  },
+  // Ensure it doesn't exclude other marks
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      HTMLAttributes: {},
+    };
+  },
+});
+function toggleBold() {
+  editor.value.chain().focus().toggleBold().run()
+}
+
+function toggleItalic() {
+  editor.value.chain().focus().toggleItalic().run()
+}
+
+function toggleUnderline() {
+  editor.value.chain().focus().toggleUnderline().run()
+
+}
+function toggleStrike() {
+  editor.value.chain().focus().toggleStrike().run()
+
+}
+function toggleHighlight() {
+  const isHighlighted = editor.value.isActive('highlight');
+  // when using toggleHighlight(), judge if is is already highlighted.
+  editor.value.chain().focus().toggleHighlight({
+    color: isHighlighted ? undefined : '#ffc078' // if is already highlighted，unset the highlight color
+  }).run();
+}
+function toggleCodeBlock() {
+  editor.value.chain().focus().toggleCodeBlock().run()
+}
+function toggleLink() {
+  const url = window.prompt('Enter image URL:', 'url');
+  editor.value.chain().focus().toggleLink({ href: url }).run();
+}
+function removeLink() {
+  editor.value.chain().focus().unsetLink().run()
+}
+function setFontSize(fontSize) {
+  editor.value.chain().focus().setMark('textStyle', { fontSize }).run();
+}
+function setColorPicker(event) {
+  const selectedColor = event.target.value;
+  editor.value.chain().focus().setColor(selectedColor).run();
+}
+function setColor(selectedColor) {
+  editor.value.chain().focus().setColor(selectedColor).run();
+}
+function resetColor() {
+  editor.value.commands.unsetColor();
+}
+function setFontFamily(fontFamily) {
+  editor.value.chain().focus().setFontFamily(fontFamily).run();
+}
+function setTextLeft() {
+  editor.value.chain().focus().setTextAlign('left').run();
+}
+function setTextCenter() {
+  editor.value.chain().focus().setTextAlign('center').run();
+}
+function setTextRight() {
+  editor.value.chain().focus().setTextAlign('right').run();
+}
+function toggleBulletList() {
+  editor.value.chain().focus().toggleBulletList().run();
+}
+function toggleOrderedList() {
+  editor.value.chain().focus().toggleOrderedList().run();
+}
+// function toggleBlockquote() {
+//   editor.value.chain().focus().toggleBlockquote().run();
+// }
+function toggleHR() {
+  editor.value.chain().focus().setHorizontalRule().run();
+}
+
+onMounted(() => {
+  initDropdowns()
+
+  editor.value = new Editor({
+    extensions: [
+      StarterKit.configure({
+        marks: {
+          bold: false,
+        },
+      }),
+      CustomBold,
+      Underline,
+      Highlight,
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: 'https',
+        HTMLAttributes: {
+          class: 'post-link',
+        }
+      }),
+      FontSizeTextStyle,
+      Color,
+      FontFamily,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      HorizontalRule
+    ],
+    content: modelValue,
+    onUpdate: () => {
+      // HTML
+      $emit('update:modelValue', editor.value.getHTML())
+      // JSON
+      // $emit('update:modelValue', editor.value.getJSON())
+    },
+  })
+})
+
+onBeforeUnmount(() => {
+  editor.value.destroy()
+})
+
+</script>
